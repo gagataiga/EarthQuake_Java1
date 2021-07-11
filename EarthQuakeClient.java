@@ -2,6 +2,7 @@
 import java.util.*;
 import edu.duke.*;
 
+
 public class EarthQuakeClient {
     
     /*
@@ -44,17 +45,40 @@ public class EarthQuakeClient {
     /**
      * This method should return an ArrayList of type QuakeEntry of all the earthquakes from quakeData whose depth is between minDepth and maxDepth, exclusive. (Do not include quakes with depth exactly minDepth or maxDepth
      * 
-     * @param quakeData -> quakeData from xml
+     * @param quakeData -> quakeData
      * @param minDepth -> Minimum value of earthquake
      * @param MaxDepth -> Maximum value of earthquake
      * @return -> 
      */    
     public ArrayList<QuakeEntry> filterByDepth(ArrayList<QuakeEntry> quakeData, Double minDepth,
-                                Double MaxDepth){
+            Double MaxDepth) {
         ArrayList<QuakeEntry> answer = new ArrayList<QuakeEntry>();
-        for(QuakeEntry qe : quakeData){
+        for (QuakeEntry qe : quakeData) {
             double currentDepth = qe.getDepth();
-            if(currentDepth > minDepth && currentDepth < MaxDepth){
+            if (currentDepth > minDepth && currentDepth < MaxDepth) {
+                answer.add(qe);
+            }
+        }
+        return answer;
+    }
+    
+    /**
+     * 
+     * @param quakeData -> all of qakeData 
+     * @param where -> the title and has one of three values: (“start”, ”end”, or “any”)
+     * @param phrase -> indicating the phrase to search for in the title of the earthquake.
+     * @return ArrayList of type QuakeEntry of all the earthquakes from quakeData whose titles have the given phrase found at location where (“start” means the phrase must start the title, “end” means the phrase must end the title and “any” means the phrase is a substring anywhere in the title.)
+     */
+
+    public ArrayList<QuakeEntry> filterByPhrase(ArrayList<QuakeEntry> quakeData, String where, String phrase) {
+        ArrayList<QuakeEntry> answer = new ArrayList<QuakeEntry>();
+        for (QuakeEntry qe : quakeData) {
+            String title = qe.getInfo();
+            if (title.startsWith(phrase)) {
+                answer.add(qe);
+            } else if (title.endsWith(phrase)) {
+                answer.add(qe);
+            } else if (title.contains(phrase)) {
                 answer.add(qe);
             }
         }
@@ -69,8 +93,7 @@ public class EarthQuakeClient {
                               qe.getLocation().getLongitude(),
                               qe.getMagnitude(),
                               qe.getInfo());
-        }
-        
+        }   
     }
     
     public void bigQuakes() {
@@ -137,9 +160,26 @@ public class EarthQuakeClient {
         System.out.println("read data for " + list.size() + " quakes");
         // filterByDepthを呼び出す
         ArrayList<QuakeEntry> bwDepthList = filterByDepth(list, -10000.0, -5000.0);
-        System.out.println("Find quakes with depth between -10000.0 and -5000.0" );
+        System.out.println("Find quakes with depth between -10000.0 and -5000.0");
         for (QuakeEntry qe : bwDepthList) {
             System.out.println(qe);
-         }
         }
+    }
+        
+    public void quakeByPhrase() {
+        EarthQuakeParser parser = new EarthQuakeParser();
+        //String source = "nov20quakedatasmall.atom";
+        String source = "data/nov20quakedatasmall.atom";
+        ArrayList<QuakeEntry> list = parser.read(source);
+        System.out.println("read data for " + list.size() + " quakes");
+        String where = "start";
+        String phrase = "California";
+        ArrayList<QuakeEntry> phraseList = filterByPhrase(list, where, phrase);
+    
+        for (QuakeEntry qe : phraseList) {
+            System.out.println(qe);
+        }
+        System.out.println("Found " + phraseList.size() + " quakes that match" + where + phrase);
+
+    }
 }
